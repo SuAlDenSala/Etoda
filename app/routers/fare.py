@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from datetime import datetime
 from pydantic import BaseModel
 import uuid
+from app.core.security import get_current_admin
+from fastapi import Depends
 
 from app.database.mongodb import db_client
 from app.models.domain import FareMatrix
@@ -40,3 +42,14 @@ async def get_fare_matrix():
     db = db_client.db
     cursor = db["fares"].find({})
     return await cursor.to_list(length=500)
+
+@router.delete("/{fare_id}", response_model=dict)
+async def delete_fare(fare_id: str, current_admin: dict = Depends(get_current_admin)):
+    """(Admin Only) Remove a route from the fare matrix."""
+    db = db_client.db
+    result = await db["fares"].delete_one({"_id": fare_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Fare route not found")
+        
+    return {"message": "Fare route deleted successfully"}

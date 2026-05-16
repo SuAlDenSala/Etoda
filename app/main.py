@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.database.mongodb import connect_to_mongo, close_mongo_connection
 
 # Import all routers
-from app.routers import sync, driver, fare, auth, commuter
+from app.routers import sync, driver, fare, auth, commuter , alerts, incidents
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,6 +25,8 @@ app.include_router(commuter.router, prefix="/api")
 app.include_router(sync.router, prefix="/api")
 app.include_router(driver.router, prefix="/api")
 app.include_router(fare.router, prefix="/api")
+app.include_router(alerts.router, prefix="/api")      # <-- ADD THIS
+app.include_router(incidents.router, prefix="/api")   # <-- ADD THIS
 
 @app.get("/")
 async def root():
