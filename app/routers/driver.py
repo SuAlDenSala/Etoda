@@ -50,10 +50,16 @@ async def register_driver(driver_data: DriverCreate):
     return new_driver
 
 @router.get("/", response_model=list[Driver])
-async def get_all_drivers():
+async def get_all_drivers(current_admin: dict = Depends(get_current_admin)):  # <-- 1. Add security dependency
     """(Admin Only) Fetches the registry of all drivers."""
     db = db_client.db
-    cursor = db["drivers"].find({})
+    
+    # 2. Get the currently logged-in admin's username
+    admin_username = current_admin.get("username")
+    
+    # 3. Tell MongoDB to find all drivers WHERE name IS NOT EQUAL ($ne) to the admin's username
+    cursor = db["drivers"].find({"name": {"$ne": admin_username}})
+    
     return await cursor.to_list(length=1000)
 
 

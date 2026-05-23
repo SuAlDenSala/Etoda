@@ -1,11 +1,11 @@
+# app/main.py
+from fastapi.responses import FileResponse
 import uvicorn
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.database.mongodb import connect_to_mongo, close_mongo_connection
 from fastapi.middleware.cors import CORSMiddleware
-
-# Import each router directly from its file to prevent package import collisions
 from app.routers import auth, commuter, sync, driver, fare, alerts, incidents
 
 @asynccontextmanager
@@ -14,9 +14,31 @@ async def lifespan(app: FastAPI):
     yield
     await close_mongo_connection()
 
+# --- ADD RICH METADATA HERE ---
+tags_metadata = [
+    {"name": "Unified Authentication & API Keys", "description": "Login and API key management."},
+    {"name": "Driver Accounts & LGU Management", "description": "Manage tricycle drivers and their LGU QR credentials."},
+    {"name": "Commuter Public Endpoints", "description": "Public registration and commuter profile management."},
+    {"name": "Offline-First Synchronization", "description": "Endpoints for the offline mobile app to push/pull sync data."},
+]
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Backend API Gateway for Unified Tricycle Transport",
+    description="""
+    Backend API Gateway for Unified Tricycle Transport. 
+    
+    This API handles:
+    * Driver and Commuter Identity Verification
+    * Fare Matrix Management
+    * Community Alerts & Incident Reporting
+    * Offline-First Sync for offline drivers
+    """,
+    version="1.0.0",
+    contact={
+        "name": "LGU IT Department",
+        "email": "admin@bongao.gov.ph",
+    },
+    openapi_tags=tags_metadata,
     lifespan=lifespan
 )
 
@@ -28,7 +50,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include all structural routing endpoints cleanly
 app.include_router(auth.router, prefix="/api")
 app.include_router(commuter.router, prefix="/api")
 app.include_router(sync.router, prefix="/api")
@@ -37,9 +58,10 @@ app.include_router(fare.router, prefix="/api")
 app.include_router(alerts.router, prefix="/api")
 app.include_router(incidents.router, prefix="/api")
 
-@app.get("/")
+@app.get("/", tags=["Health Check"])
 async def root():
-    return {"message": "eTODA Bongao Sync Gateway is running."}
+    # Serve the HTML frontend dashboard instead of the JSON message
+    return FileResponse("static/index.html")
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=2011, reload=True)

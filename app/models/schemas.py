@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from .domain import IncidentReport, Driver, FareMatrix, CommunityAlert
 
@@ -37,3 +37,13 @@ class DriverUpdate(BaseModel):
 class CommuterUpdate(BaseModel):
     name: Optional[str] = None
     discount_status: Optional[str] = None # e.g., "Regular",
+
+class CommuterCreate(BaseModel):
+    name: str = Field(..., description="The commuter's full name", example="Juan Dela Cruz")
+    email: str = Field(..., description="A valid email address", example="juan@example.com")
+    password: str = Field(..., description="Account password (min 8 characters)", example="SecurePass123!")
+    discount_status: str = Field(
+        default="Regular", 
+        description="Discount category: 'Regular', 'Student', 'PWD', or 'Senior'", 
+        example="Student"
+    )

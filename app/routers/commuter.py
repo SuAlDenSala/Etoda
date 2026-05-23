@@ -88,3 +88,22 @@ async def delete_commuter(
         raise HTTPException(status_code=404, detail="Commuter not found")
         
     return {"message": "Commuter deleted successfully"}
+
+router = APIRouter(prefix="/commuters", tags=["Commuter Public Endpoints"])
+
+@router.post(
+    "/register", 
+    response_model=dict, 
+    status_code=status.HTTP_201_CREATED,
+    summary="Register a new Commuter",
+    response_description="Returns the created commuter's ID and verification status"
+)
+async def register_commuter(commuter_data: CommuterCreate):
+    """
+    Creates a new commuter profile in the database.
+    
+    - **name**: Full name of the commuter.
+    - **email**: Unique email address.
+    - **password**: Will be securely hashed.
+    - **discount_status**: If "Regular", the account is automatically verified. Other statuses require LGU manual verification.
+    """

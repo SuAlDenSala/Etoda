@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 from app.models.schemas import Token
 from app.models.domain import ExternalApp
-from app.core.security import create_access_token, verify_password, get_api_key_hash, get_current_admin
+from app.core.security import create_access_token, verify_password, get_api_key_hash, get_current_admin, get_password_hash
+from app.core.config import settings
 from app.database.mongodb import db_client
 import uuid
 import secrets
@@ -62,3 +64,61 @@ async def generate_app_api_key(current_admin: dict = Depends(get_current_admin))
         "api_key": raw_api_key,
         "permissions": default_permissions
     }
+
+
+# --- NEW ADMIN SETUP ENDPOINT ---
+
+class AdminSetup(BaseModel):
+    username: str
+    password: str
+    master_secret: str  # Required to prove you are the system owner
+
+@router.post("/setup-admin", status_code=status.HTTP_201_CREATED)
+async def setup_first_admin(admin_data: AdminSetup):
+    """Hidden endpoint to create the very first LGU Admin account."""
+    # 1. Verify the person calling this knows the .env SECRET_KEY
+    if admin_data.master_secret != settings.SECRET_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Invalid master secret."
+        )
+        
+    db = db_client.db
+    
+    # 2. Check if this admin already exists
+    existing_admin = await db["admins"].find_one({"username": admin_data.username})
+    if existing_admin:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Admin account already exists."
+        )
+        
+    # 3. Hash password and save to DB
+    hashed_pwd = get_password_hash(admin_data.password)
+    
+    await db["admins"].insert_one({
+        "username": admin_data.username,
+        "hashed_password": hashed_pwd,
+        "role": "admin"  # Hardcode the admin role
+    })
+    
+    return {"message": f"Admin account '{admin_data.username}' created successfully. You can now log in."}
+
+@router.delete("/delete-admin/{admin_username}", response_model=dict)
+async def delete_admin(admin_username: str, current_admin: dict = Depends(get_current_admin)):
+    """(Admin Only) Permanently remove an LGU Admin account."""
+    db = db_client.db
+    
+    # Safeguard: Prevent the admin from accidentally deleting themselves while logged in!
+    if current_admin.get("username") == admin_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="You cannot delete your own currently active account."
+        )
+        
+    result = await db["admins"].delete_one({"username": admin_username})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Admin account not found")
+        
+    return {"message": f"Admin '{admin_username}' deleted successfully"}

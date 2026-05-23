@@ -76,4 +76,4 @@ async def verify_external_app(api_key: str = Security(api_key_header)):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid or revoked API Key",
         )
-    return app_record
+    return app_record 

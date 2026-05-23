@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etoda Gateway</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom Tailwind Configuration & Styling -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            900: '#312e81',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 20px rgba(99, 102, 241, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth scrolling & utilities */
+        html { scroll-behavior: smooth; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom Background Patterns */
+        .bg-grid-pattern {
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .dark-glass-header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Tab Transition */
+        .dash-tab-content { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-slate-800 bg-slate-50 antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- VIEW: LANDING PAGE -->
+    <div id="view-landing" class="app-view min-h-screen bg-white relative overflow-hidden flex flex-col">
+        <!-- Background decorative elements -->
+        <div class="absolute inset-0 bg-grid-pattern opacity-[0.3] pointer-events-none"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[500px] bg-brand-500/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+
+        <!-- Header -->
+        <header class="glass-header sticky top-0 z-50 flex justify-between items-center px-6 md:px-12 py-5 border-b border-slate-200/50">
+            <div class="flex items-center space-x-2 text-brand-600 font-extrabold text-xl tracking-tight">
+                <div class="bg-gradient-to-br from-brand-500 to-violet-600 text-white p-1.5 rounded-lg shadow-sm">
+                    <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+                </div>
+                <span>Etoda Gateway</span>
+            </div>
+            <div class="flex items-center space-x-5 text-sm font-semibold text-slate-600">
+                <a href="https://github.com/SuAlDenSala/Etoda.git" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-slate-900 transition-colors flex items-center p-1" title="View on GitHub">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                    </svg>
+                </a>
+                <button onclick="navigate('setup')" class="bg-brand-600 text-white hover:bg-brand-700 px-5 py-2.5 rounded-lg transition-all shadow-sm hover:shadow-md">
+                    Admin Login
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero Content -->
+        <main class="flex-1 flex flex-col items-center justify-center text-center px-4 pt-16 pb-24 z-10">
+            <div class="inline-flex items-center space-x-2 bg-brand-50 border border-brand-100 text-brand-600 px-4 py-1.5 rounded-full text-sm font-semibold mb-8 shadow-sm">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                </span>
+                <span>Gateway v2.0 is live</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight mb-6 leading-[1.1]">
+                Backend API Gateway for <br/> 
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-violet-500">Unified Tricycle Transport</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Handling Driver & Commuter Identity Verification, Fare Matrix Management, Community Alerts, and Offline-First Sync for offline drivers.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                <button onclick="navigate('dev-portal')" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3.5 px-8 rounded-full shadow-lg hover:shadow-glow transition-all duration-300">
+                    Read the Docs
+                </button>
+                <a href="https://etoda.vercel.app/docs" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold py-3.5 px-8 rounded-full shadow-sm transition-all duration-300 flex items-center justify-center">
+                    Test the API
+                </a>
+            </div>
+        </main>
+        
+        <footer class="py-8 text-center text-sm text-slate-400 font-medium z-10 border-t border-slate-100 bg-white">
+            &copy; 2026 Tawi-Tawi Super App Platform.
+        </footer>
+    </div>
+
+    <!-- VIEW: DEVELOPER PORTAL -->
+    <div id="view-dev-portal" class="app-view hidden min-h-screen bg-slate-50 flex flex-col">
+        <!-- Dev Portal Header - Sticky -->
+        <header class="dark-glass-header border-b border-slate-800 px-6 py-4 flex justify-between items-center text-white sticky top-0 z-50">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-500/20 p-1.5 rounded-lg border border-brand-500/30">
+                    <i data-lucide="zap" class="w-5 h-5 text-brand-400 fill-current"></i>
+                </div>
+                <h1 class="text-lg font-bold tracking-tight">
+                    Etoda Gateway <span class="font-normal text-slate-400 border-l border-slate-700 ml-2 pl-2">Developer Portal</span>
+                </h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="navigate('landing')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back
+                </button>
+                <a href="https://github.com/SuAlDenSala/Etoda.git" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-white transition-colors flex items-center mx-2" title="View on GitHub">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                    </svg>
+                </a>
+                <a href="https://etoda.vercel.app/docs" target="_blank" rel="noopener noreferrer" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-glow block">
+                    Open Swagger UI
+                </a>
+            </div>
+        </header>
+
+        <!-- Dev Portal Content -->
+        <div class="flex flex-1 max-w-7xl mx-auto w-full relative">
+            
+            <!-- Sidebar - Sticky -->
+            <aside class="w-64 py-10 pr-8 hidden md:block sticky top-[72px] h-[calc(100vh-72px)] overflow-y-auto no-scrollbar">
+                <h3 class="text-xs font-bold text-slate-400 tracking-wider mb-4 uppercase">Getting Started</h3>
+                <ul class="space-y-1 mb-10 border-l border-slate-200">
+                    <li><a href="#architecture" id="link-architecture" class="dev-nav-link text-brand-600 text-sm font-bold border-l-2 border-brand-600 pl-4 py-2 block bg-brand-50 -ml-[1px]">1. Architecture Overview</a></li>
+                    <li><a href="#setup" id="link-setup" class="dev-nav-link text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors pl-4 py-2 block border-l-2 border-transparent hover:border-slate-300 -ml-[1px]">2. Local Setup</a></li>
+                </ul>
+                
+                <h3 class="text-xs font-bold text-slate-400 tracking-wider mb-4 uppercase">Frontend Integration</h3>
+                <ul class="space-y-1 mb-10 border-l border-slate-200">
+                    <li><a href="#auth-headers" id="link-auth-headers" class="dev-nav-link text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors pl-4 py-2 block border-l-2 border-transparent hover:border-slate-300 -ml-[1px]">Auth Headers</a></li>
+                    <li><a href="#core-rest" id="link-core-rest" class="dev-nav-link text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors pl-4 py-2 block border-l-2 border-transparent hover:border-slate-300 -ml-[1px]">Core REST Operations</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Doc Content -->
+            <main class="flex-1 py-10 md:pl-12 lg:pl-16 max-w-4xl pb-32">
+                <h1 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">API Documentation</h1>
+                <p class="text-slate-600 mb-12 text-lg leading-relaxed">
+                    This guide details how to consume the Gateway from a mobile or web frontend, and outlines the strict B2B contract required for external microservices to join the Super App ecosystem.
+                </p>
+
+                <!-- Section: Architecture Overview -->
+                <div id="architecture" class="scroll-mt-24 mb-16 doc-section">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <span class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-sm">1</span>
+                        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Architecture Overview</h2>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-soft">
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            The Etoda Gateway acts as the central brain. It handles public user authentication and securely routes authenticated user data to specialized internal microservices.
+                        </p>
+                        <ul class="space-y-4 text-slate-700">
+                            <li class="flex items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="bg-white p-2 rounded-md shadow-sm mr-4"><i data-lucide="server" class="w-4 h-4 text-brand-500"></i></div>
+                                <strong>API Protocol:</strong> <code class="ml-auto text-pink-600 bg-pink-50 border border-pink-100 px-2 py-0.5 rounded text-sm font-mono">RESTful (FastAPI)</code>
+                            </li>
+                            <li class="flex items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="bg-white p-2 rounded-md shadow-sm mr-4"><i data-lucide="link" class="w-4 h-4 text-brand-500"></i></div>
+                                <strong>Primary Endpoint:</strong> <code class="ml-auto text-pink-600 bg-pink-50 border border-pink-100 px-2 py-0.5 rounded text-sm font-mono">/api/*</code>
+                            </li>
+                            <li class="flex items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="bg-white p-2 rounded-md shadow-sm mr-4"><i data-lucide="database" class="w-4 h-4 text-brand-500"></i></div>
+                                <strong>Database:</strong> <span class="ml-auto font-medium">MongoDB (Motor AsyncIO)</span>
+                            </li>
+                            <li class="flex items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="bg-white p-2 rounded-md shadow-sm mr-4"><i data-lucide="shield-check" class="w-4 h-4 text-brand-500"></i></div>
+                                <strong>Authentication:</strong> <span class="ml-auto font-medium">Stateless JWT (Bearer)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section: Local Environment Setup -->
+                <div id="setup" class="scroll-mt-24 mb-16 doc-section">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <span class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-sm">2</span>
+                        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Local Environment Setup</h2>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-soft">
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            To run the Gateway locally, ensure Python 3.10+ is installed. Create a <code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-200">.env</code> file in the root directory based on <code>app/core/config.py</code>:
+                        </p>
+                        <!-- MacOS Style Code Block -->
+                        <div class="bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-800">
+                            <div class="bg-slate-800/50 px-4 py-3 flex items-center space-x-2 border-b border-slate-700/50">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                <span class="ml-4 text-xs text-slate-400 font-mono">.env</span>
+                            </div>
+                            <div class="p-6 font-mono text-sm text-[#a5d6ff] overflow-x-auto leading-relaxed">
+                                <span class="text-slate-500"># --- Server Configuration ---</span><br/>
+                                <span class="text-[#7ee787]">PROJECT_NAME</span>="eTODA Bongao API"<br/>
+                                <span class="text-[#7ee787]">PORT</span>=2011<br/><br/>
+                                <span class="text-slate-500"># --- MongoDB Database ---</span><br/>
+                                <span class="text-[#7ee787]">MONGODB_URL</span>=mongodb://localhost:27017<br/>
+                                <span class="text-[#7ee787]">DATABASE_NAME</span>=etoda_db<br/><br/>
+                                <span class="text-slate-500"># --- Security & JWT ---</span><br/>
+                                <span class="text-[#7ee787]">SECRET_KEY</span>=super-secret-key-for-tcto-lgu<br/>
+                                <span class="text-[#7ee787]">ALGORITHM</span>=HS256<br/>
+                                <span class="text-[#7ee787]">ACCESS_TOKEN_EXPIRE_MINUTES</span>=120
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-16 border-slate-200" />
+
+                <!-- Section: Authentication Headers -->
+                <div id="auth-headers" class="scroll-mt-24 mb-16 doc-section">
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight mb-4">Authentication Headers</h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        When communicating with protected routes, mobile and web frontends must attach their active JSON Web Token (JWT). The Gateway uses the <code class="bg-slate-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-200">get_current_admin</code> and commuter dependencies to validate sessions statelessly.
+                    </p>
+                    <div class="bg-slate-900 rounded-xl p-5 font-mono text-sm text-[#7ee787] shadow-lg border border-slate-800">
+                        Authorization: Bearer &lt;your_jwt_token_here&gt;
+                    </div>
+                </div>
+
+                <!-- Section: Core REST Operations -->
+                <div id="core-rest" class="scroll-mt-24 mb-16 doc-section">
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight mb-6">Core REST Operations</h2>
+                    
+                    <div class="space-y-8">
+                        <!-- Module block -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                            <h3 class="flex items-center text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 pb-4 border-b border-slate-100">
+                                <i data-lucide="lock" class="w-4 h-4 mr-2 text-slate-400"></i> Authentication & Security
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex items-center min-w-[200px] mb-2 sm:mb-0">
+                                        <span class="bg-blue-100 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md mr-3">POST</span> 
+                                        <code class="text-slate-800 font-mono text-sm">/api/auth/login</code>
+                                    </div>
+                                    <p class="text-sm text-slate-600 flex-1">Unified OAuth2 login for LGU Admins and Public Commuters. Returns JWT Bearer token.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Module block -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                            <h3 class="flex items-center text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 pb-4 border-b border-slate-100">
+                                <i data-lucide="users" class="w-4 h-4 mr-2 text-slate-400"></i> Identity & Users
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex items-center min-w-[200px] mb-2 sm:mb-0">
+                                        <span class="bg-blue-100 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md mr-3">POST</span> 
+                                        <code class="text-slate-800 font-mono text-sm">/api/commuters/register</code>
+                                    </div>
+                                    <p class="text-sm text-slate-600 flex-1">Public commuter registration. Non-regular statuses pend LGU approval.</p>
+                                </div>
+                                <div class="flex flex-col sm:flex-row sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex items-center min-w-[200px] mb-2 sm:mb-0">
+                                        <span class="bg-blue-100 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md mr-3">POST</span> 
+                                        <code class="text-slate-800 font-mono text-sm">/api/drivers/login</code>
+                                    </div>
+                                    <p class="text-sm text-slate-600 flex-1">Authenticates a Driver using LGU-issued cryptographic QR Code hash.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Module block -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                            <h3 class="flex items-center text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 pb-4 border-b border-slate-100">
+                                <i data-lucide="refresh-cw" class="w-4 h-4 mr-2 text-slate-400"></i> Offline-First Synchronization
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex items-center min-w-[200px] mb-2 sm:mb-0">
+                                        <span class="bg-emerald-100 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-md mr-3">GET</span> 
+                                        <code class="text-slate-800 font-mono text-sm">/api/sync/pull</code>
+                                    </div>
+                                    <p class="text-sm text-slate-600 flex-1">Mobile client requests updates. Returns drivers, fares, and community alerts.</p>
+                                </div>
+                                <div class="flex flex-col sm:flex-row sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex items-center min-w-[200px] mb-2 sm:mb-0">
+                                        <span class="bg-blue-100 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md mr-3">POST</span> 
+                                        <code class="text-slate-800 font-mono text-sm">/api/sync/push</code>
+                                    </div>
+                                    <p class="text-sm text-slate-600 flex-1">Uploads queued offline incident reports into central DB.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Module block -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                            <h3 class="flex items-center text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 pb-4 border-b border-slate-100">
+                                <i data-lucide="map" class="w-4 h-4 mr-2 text-slate-400"></i> Transport Data
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex items-center min-w-[200px] mb-2 sm:mb-0">
+                                        <span class="bg-emerald-100 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-md mr-3">GET</span> 
+                                        <code class="text-slate-800 font-mono text-sm">/api/fares/</code>
+                                    </div>
+                                    <p class="text-sm text-slate-600 flex-1">Fetch LGU Fare Matrix (Origin, Destination, Specific Fares).</p>
+                                </div>
+                                <div class="flex flex-col sm:flex-row sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex items-center min-w-[200px] mb-2 sm:mb-0">
+                                        <span class="bg-blue-100 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md mr-3">POST</span> 
+                                        <code class="text-slate-800 font-mono text-sm">/api/incidents/</code>
+                                    </div>
+                                    <p class="text-sm text-slate-600 flex-1">Queue and record local transit incident reports tied to driver QR.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- VIEW: SETUP/LOGIN -->
+    <div id="view-setup" class="app-view hidden min-h-screen bg-slate-50 flex flex-col relative overflow-hidden">
+        
+        <!-- Decorative Background -->
+        <div class="absolute inset-0 z-0 flex">
+            <div class="w-1/2 bg-slate-900 h-full hidden md:block"></div>
+            <div class="w-full md:w-1/2 bg-slate-50 h-full"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="flex justify-between items-center px-8 py-6 absolute top-0 w-full z-20">
+            <button onclick="navigate('landing')" class="flex items-center space-x-2 text-white md:text-white text-brand-600 font-extrabold text-xl tracking-tight hover:opacity-80 transition-opacity drop-shadow-sm">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <span>Home</span>
+            </button>
+        </header>
+
+        <div class="flex-1 flex flex-col justify-center items-center p-4 z-10">
+            <div class="w-full max-w-[420px] bg-white rounded-[24px] shadow-2xl shadow-slate-900/10 overflow-hidden border border-slate-100">
+                <div class="p-8 pb-6 flex flex-col items-center text-center">
+                    <div class="bg-brand-50 p-4 rounded-2xl mb-5 shadow-sm border border-brand-100 text-brand-600">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+                    <h2 id="setup-title" class="text-2xl font-extrabold text-slate-900 tracking-tight">Admin Gateway</h2>
+                    <p id="setup-subtitle" class="text-sm text-slate-500 mt-2 font-medium">Secure access to LGU platform management.</p>
+                </div>
+
+                <form id="setup-form" onsubmit="handleLoginOrSetup(event)" class="px-8 pb-8 space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Username</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </div>
+                            <input type="text" id="setup-username" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-slate-800 font-medium placeholder-slate-400" placeholder="admin" required />
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                            </div>
+                            <input type="password" id="setup-password" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-slate-800 font-medium placeholder-slate-400" placeholder="••••••••" required />
+                        </div>
+                    </div>
+
+                    <div id="setup-error" class="hidden bg-red-50 text-red-600 text-sm p-3.5 rounded-xl border border-red-100 flex items-start space-x-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                        <span class="font-medium leading-tight" id="setup-error-msg"></span>
+                    </div>
+
+                    <button type="submit" id="setup-submit-btn" class="w-full py-3.5 px-4 rounded-xl font-bold text-white bg-slate-900 hover:bg-brand-600 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center mt-6">
+                        <span id="setup-btn-text">Sign In</span>
+                        <i id="setup-spinner" data-lucide="refresh-cw" class="w-5 h-5 animate-spin hidden ml-2"></i>
+                    </button>
+
+                    <div class="mt-6 text-center border-t border-slate-100 pt-6">
+                        <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sm font-semibold text-slate-500 hover:text-brand-600 transition-colors focus:outline-none">
+                            Need to initialize the system? Setup Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW: DASHBOARD -->
+    <div id="view-dashboard" class="app-view hidden min-h-screen bg-slate-50 flex flex-col">
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-30 shadow-sm">
+            <div class="flex items-center space-x-4">
+                <div class="bg-gradient-to-br from-brand-600 to-violet-700 p-2.5 rounded-xl shadow-sm">
+                    <i data-lucide="car-front" class="text-white w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-900 leading-tight tracking-tight">eTODA Transport</h1>
+                    <div class="flex items-center mt-0.5 space-x-1.5">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Bongao LGU Active</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-5">
+                <div class="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-1.5 pr-3 rounded-full transition-colors border border-transparent hover:border-slate-200">
+                    <div class="bg-brand-100 p-2 rounded-full text-brand-700">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </div>
+                    <span id="dashboard-username" class="font-bold text-slate-700 text-sm">Admin</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                </div>
+                <div class="h-8 w-px bg-slate-200"></div>
+                <button onclick="logout()" class="flex items-center space-x-2 text-sm font-bold text-slate-500 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span class="hidden sm:block">Logout</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 p-6 max-w-[1400px] mx-auto w-full space-y-8">
+            <!-- Stats Row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Stat Card 1 -->
+                <div class="bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl p-6 shadow-lg shadow-brand-500/20 text-white relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 text-white/10 group-hover:scale-110 transition-transform duration-500">
+                        <i data-lucide="users" class="w-32 h-32"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-brand-100 font-semibold text-sm uppercase tracking-wider mb-2">Registered Drivers</p>
+                        <div class="flex items-baseline space-x-2">
+                            <span id="stat-drivers" class="text-5xl font-extrabold tracking-tight">0</span>
+                            <span class="text-brand-200 font-medium">active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat Card 2 -->
+                <div class="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 shadow-lg shadow-orange-500/20 text-white relative overflow-hidden group opacity-80">
+                    <div class="absolute -right-6 -top-6 text-white/10 group-hover:scale-110 transition-transform duration-500">
+                        <i data-lucide="navigation" class="w-32 h-32"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-orange-100 font-semibold text-sm uppercase tracking-wider mb-2">Trips Today</p>
+                        <div class="flex items-baseline space-x-2">
+                            <span class="text-5xl font-extrabold tracking-tight">N/A</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat Card 3 -->
+                <div class="bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl p-6 shadow-lg shadow-teal-500/20 text-white relative overflow-hidden group opacity-80">
+                    <div class="absolute -right-6 -top-6 text-white/10 group-hover:scale-110 transition-transform duration-500">
+                        <i data-lucide="wallet" class="w-32 h-32"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-teal-100 font-semibold text-sm uppercase tracking-wider mb-2">Revenue Today</p>
+                        <div class="flex items-baseline space-x-2">
+                            <span class="text-5xl font-extrabold tracking-tight">N/A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[600px]">
+                
+                <!-- Modern Segmented Control Tabs -->
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <div class="bg-slate-200/60 p-1 rounded-xl inline-flex space-x-1">
+                        <button onclick="switchDashTab('Drivers')" id="tab-btn-Drivers" class="dash-tab-btn px-5 py-2 rounded-lg text-sm transition-all bg-white font-bold shadow-sm text-slate-800 border border-slate-200/50">Drivers List</button>
+                        <button onclick="switchDashTab('Incidents')" id="tab-btn-Incidents" class="dash-tab-btn px-5 py-2 rounded-lg text-sm transition-all font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent">Incident Reports</button>
+                        <button onclick="switchDashTab('Broadcast')" id="tab-btn-Broadcast" class="dash-tab-btn px-5 py-2 rounded-lg text-sm transition-all font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent">Broadcasts</button>
+                    </div>
+                    
+                    <button class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-slate-800 transition-colors">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Action
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto bg-white p-6">
+                    <!-- Drivers Tab (Dynamic) -->
+                    <div id="tab-content-Drivers" class="dash-tab-content block h-full">
+                        <div class="mb-6 flex justify-between items-end">
+                            <div>
+                                <h3 class="text-xl font-extrabold text-slate-900">Driver Management</h3>
+                                <p class="text-sm text-slate-500 mt-1 font-medium">Real-time synchronized data from active drivers.</p>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-xs">
+                                        <th class="py-4 pl-5">Driver Name</th>
+                                        <th class="py-4 text-left">Franchise No.</th>
+                                        <th class="py-4 text-left">QR Hash</th>
+                                        <th class="py-4 text-center">Status</th>
+                                        <th class="py-4 text-right pr-5">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="drivers-table-body" class="text-slate-700 font-medium divide-y divide-slate-100 bg-white">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Incidents Tab (Dynamic) -->
+                    <div id="tab-content-Incidents" class="dash-tab-content hidden h-full">
+                        <h3 class="text-xl font-extrabold text-slate-900">Incident Reports</h3>
+                        <p class="text-sm text-slate-500 mt-1 font-medium mb-6">Queued offline reports synced from commuters.</p>
+                        <div id="incidents-list" class="space-y-4 max-w-3xl"></div>
+                    </div>
+
+                    <!-- Broadcast Tab (Dynamic) -->
+                    <div id="tab-content-Broadcast" class="dash-tab-content hidden h-full">
+                        <h3 class="text-xl font-extrabold text-slate-900">Community Alerts</h3>
+                        <p class="text-sm text-slate-500 mt-1 font-medium mb-6">Active announcements and road alerts across the network.</p>
+                        <div id="alerts-list" class="space-y-4 max-w-3xl"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Logic (Preserved functionality) -->
+    <script>
+        lucide.createIcons();
+        let currentAuthToken = null; 
+        let isLoginMode = true; 
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('setup-title');
+            const subtitle = document.getElementById('setup-subtitle');
+            const btnText = document.getElementById('setup-btn-text');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+            const errorBox = document.getElementById('setup-error');
+
+            errorBox.classList.add('hidden'); 
+            document.getElementById('setup-password').value = '';
+
+            if (isLoginMode) {
+                title.textContent = 'Admin Gateway';
+                subtitle.textContent = 'Secure access to LGU platform management.';
+                btnText.textContent = 'Sign In';
+                toggleBtn.textContent = 'Need to initialize the system? Setup Account';
+            } else {
+                title.textContent = 'Initialize System';
+                subtitle.textContent = 'Create the master LGU Admin account.';
+                btnText.textContent = 'Create Account';
+                toggleBtn.textContent = 'Already have an account? Sign In';
+            }
+        }
+
+        function navigate(viewId) {
+            document.querySelectorAll('.app-view').forEach(view => view.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function logout() {
+            currentAuthToken = null;
+            navigate('landing');
+        }
+
+        function switchDashTab(tabName) {
+            // Reset all buttons
+            document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+                btn.className = 'dash-tab-btn px-5 py-2 rounded-lg text-sm transition-all font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent';
+            });
+            // Hide all content
+            document.querySelectorAll('.dash-tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+
+            // Activate chosen tab
+            document.getElementById(`tab-btn-${tabName}`).className = 'dash-tab-btn px-5 py-2 rounded-lg text-sm transition-all bg-white font-bold shadow-sm text-slate-800 border border-slate-200/50';
+            const activeContent = document.getElementById(`tab-content-${tabName}`);
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('block');
+        }
+
+        async function handleLoginOrSetup(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('setup-username').value;
+            const passwordInput = document.getElementById('setup-password').value;
+            const secretInput = 'super-secret-key-for-tcto-lgu';
+            
+            const submitBtn = document.getElementById('setup-submit-btn');
+            const errorBox = document.getElementById('setup-error');
+            const errorMsg = document.getElementById('setup-error-msg');
+            const spinner = document.getElementById('setup-spinner');
+
+            errorBox.classList.add('hidden');
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+
+            try {
+                if (isLoginMode) {
+                    const formData = new URLSearchParams();
+                    formData.append('username', usernameInput);
+                    formData.append('password', passwordInput);
+
+                    let response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const err = await response.json();
+                        throw new Error(err.detail || "Invalid username or password.");
+                    }
+                    
+                    const data = await response.json();
+                    currentAuthToken = data.access_token;
+
+                } else {
+                    if(!secretInput) throw new Error("Master Secret is required for setup.");
+                    
+                    const setupRes = await fetch('/api/auth/setup-admin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: usernameInput, password: passwordInput, master_secret: secretInput })
+                    });
+                    
+                    if (!setupRes.ok) {
+                        const errorData = await setupRes.json();
+                        throw new Error(errorData.detail || "Account setup failed.");
+                    }
+                    
+                    const formData = new URLSearchParams();
+                    formData.append('username', usernameInput);
+                    formData.append('password', passwordInput);
+                    
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    currentAuthToken = data.access_token;
+                }
+
+                document.getElementById('dashboard-username').textContent = usernameInput;
+                navigate('dashboard');
+                fetchDashboardData();
+
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorBox.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        }
+
+        async function fetchDashboardData() {
+            const authHeaders = { 'Authorization': `Bearer ${currentAuthToken}` };
+
+            try {
+                const driversRes = await fetch('/api/drivers/', { headers: authHeaders });
+                if (driversRes.ok) {
+                    const allDrivers = await driversRes.json();
+                    
+                    // Get the current admin username to exclude from the count
+                    const adminUsername = document.getElementById('dashboard-username').textContent;
+                    
+                    // Filter out the admin account from the driver list
+                    const drivers = allDrivers.filter(d => d.name !== adminUsername);
+                    
+                    // Update the count using the filtered array length
+                    document.getElementById('stat-drivers').innerText = drivers.length;
+                    
+                    const tBody = document.getElementById('drivers-table-body');
+                    tBody.innerHTML = drivers.length ? '' : '<tr><td colspan="5" class="py-12 text-center text-slate-400 font-medium"><div class="flex flex-col items-center"><i data-lucide="users" class="w-8 h-8 mb-3 text-slate-300"></i>No drivers registered yet</div></td></tr>';
+                    
+                    // Populate table with filtered drivers
+                    drivers.forEach(d => {
+                        tBody.innerHTML += `
+                            <tr class="hover:bg-slate-50/50 transition-colors group">
+                                <td class="py-4 pl-5">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="bg-brand-50 text-brand-600 p-2 rounded-full">
+                                            <i data-lucide="user" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="font-bold text-slate-900">${d.name}</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-slate-600 font-semibold">${d.franchise_number}</td>
+                                <td class="py-4">
+                                    <span class="font-mono text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">
+                                        ${d.qr_hash ? d.qr_hash.substring(0, 8) + '...' : 'N/A'}
+                                    </span>
+                                </td>
+                                <td class="py-4 text-center">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold border ${d.is_active ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-red-50 text-red-600 border-red-200'}">
+                                        ${d.is_active ? 'Active' : 'Suspended'}
+                                    </span>
+                                </td>
+                                <td class="py-4 text-right pr-5">
+                                    <button onclick="deleteDriver('${d.id}', '${d.name}')" class="text-slate-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 focus:opacity-100" title="Delete Driver">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                const incRes = await fetch('/api/incidents/', { headers: authHeaders });
+                if (incRes.ok) {
+                    const incidents = await incRes.json();
+                    const incList = document.getElementById('incidents-list');
+                    incList.innerHTML = incidents.length ? '' : '<div class="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed"><i data-lucide="shield-check" class="w-8 h-8 text-slate-300 mx-auto mb-3"></i><p class="text-slate-500 font-medium">No incidents reported</p></div>';
+                    
+                    incidents.forEach(inc => {
+                        incList.innerHTML += `
+                            <div class="bg-white border border-slate-200 rounded-xl p-5 flex items-start space-x-4 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="bg-red-50 p-3 rounded-xl border border-red-100 text-red-600">
+                                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-extrabold text-slate-900">Incident Reported</h4>
+                                        <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">${new Date(inc.timestamp).toLocaleString()}</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 mt-2 leading-relaxed">${inc.issue_description}</p>
+                                    <div class="mt-4 flex items-center text-xs font-bold text-slate-500">
+                                        <i data-lucide="qr-code" class="w-3.5 h-3.5 mr-1.5"></i> Driver QR: <span class="font-mono ml-1 text-slate-700">${inc.driver_qr_hash.substring(0,8)}...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                const alertsRes = await fetch('/api/alerts/');
+                if (alertsRes.ok) {
+                    const alerts = await alertsRes.json();
+                    const alertsList = document.getElementById('alerts-list');
+                    alertsList.innerHTML = alerts.length ? '' : '<div class="text-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed"><i data-lucide="radio" class="w-8 h-8 text-slate-300 mx-auto mb-3"></i><p class="text-slate-500 font-medium">No active broadcasts</p></div>';
+                    
+                    alerts.forEach(al => {
+                        alertsList.innerHTML += `
+                            <div class="${al.is_critical ? 'bg-orange-50 border-orange-200' : 'bg-brand-50 border-brand-200'} border rounded-xl p-5 flex items-start space-x-4 shadow-sm">
+                                <div class="${al.is_critical ? 'bg-orange-100 text-orange-600' : 'bg-brand-100 text-brand-600'} p-2 rounded-lg">
+                                    <i data-lucide="${al.is_critical ? 'siren' : 'info'}" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-extrabold text-slate-900 text-base">${al.title}</h4>
+                                    <p class="text-sm text-slate-600 mt-1 leading-relaxed">${al.message}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                lucide.createIcons(); 
+
+            } catch (err) {
+                console.error("Failed fetching live data:", err);
+            }
+        }
+    </script>
+</body>
+</html>
