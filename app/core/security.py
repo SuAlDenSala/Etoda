@@ -101,4 +101,5 @@ async def get_current_commuter(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
         
-    return user
+    return 
+

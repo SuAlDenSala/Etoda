@@ -60,3 +60,5 @@ class ExternalApp(BaseModel):
     api_key_hash: str     # Hashed for security, just like passwords
     permissions: list     # e.g., ["read_fares", "read_alerts"]
     created_at: datetime
+
+    

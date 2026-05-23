@@ -235,7 +235,7 @@ async def rate_driver(
     if not driver:
         raise HTTPException(status_code=404, detail="Driver not found.")
 
-    current_score = driver.get("community_trust_score", 0.0)
+    current_score = driver.get("communi7ty_trust_score", 0.0)
     total_ratings = driver.get("total_ratings", 0)
 
     new_total = total_ratings + 1
