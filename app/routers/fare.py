@@ -1,10 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime
 from pydantic import BaseModel
 import uuid
-from app.core.security import get_current_admin
-from fastapi import Depends
 
+from app.core.security import get_current_admin
 from app.database.mongodb import db_client
 from app.models.domain import FareMatrix
 
@@ -17,7 +16,11 @@ class FareCreate(BaseModel):
     student_pwd_fare: float
 
 @router.post("/", response_model=FareMatrix)
-async def create_or_update_fare(fare_data: FareCreate):
+async def create_or_update_fare(
+    fare_data: FareCreate, 
+    current_admin: dict = Depends(get_current_admin) # <-- ADDED SECURITY LOCK HERE
+):
+    """(Admin Only) Add or update a route in the fare matrix."""
     db = db_client.db
     
     fare_id = str(uuid.uuid4())
@@ -39,6 +42,7 @@ async def create_or_update_fare(fare_data: FareCreate):
 
 @router.get("/", response_model=list[FareMatrix])
 async def get_fare_matrix():
+    """Publicly accessible endpoint to fetch the current fare matrix."""
     db = db_client.db
     cursor = db["fares"].find({})
     return await cursor.to_list(length=500)
