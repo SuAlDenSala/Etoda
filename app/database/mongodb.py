@@ -16,7 +16,7 @@ db_client.client = AsyncIOMotorClient(
     settings.MONGODB_URL, 
     tlsCAFile=certifi.where()
 )
-db_client.db = db_client.client[settings.DATABASE_NAME]
+db_client.db = db_client.client["etoda_db"]
 
 # Keep these empty functions so app/main.py doesn't crash when it calls them
 async def connect_to_mongo():
