@@ -15,19 +15,49 @@ from app.core.config import settings
 from app.core.security import oauth2_scheme
 from app.models.domain import CommuterRating # Assuming you added this to domain.py
 from app.models.schemas import DriverSelfRegister, RatingCreate
+from app.core.security import get_current_admin, get_current_commuter, get_password_hash
+from app.models.schemas import DriverUpdate, Token, DriverCreate, DriverSelfRegister, RatingCreate
 
 from app.core.security import get_current_admin, get_current_commuter # <-- Import the new function for dual-token auth
 
 router = APIRouter(prefix="/drivers", tags=["Driver Accounts & LGU Management"])
 
-class DriverCreate(BaseModel):
-    name: str
-    franchise_number: str
+# class DriverCreate(BaseModel):
+#     name: str
+#     franchise_number: str
 
 class DriverLogin(BaseModel):
     qr_hash: str
 
 # --- USER SIDE: DRIVER APP ENDPOINTS ---
+
+# @router.post("/signup", response_model=dict, status_code=status.HTTP_201_CREATED)
+# async def public_driver_signup(driver_data: DriverCreate):
+#     """(Public) Driver self-registration. Pending LGU approval."""
+#     db = db_client.db
+    
+#     existing = await db["drivers"].find_one({"franchise_number": driver_data.franchise_number})
+#     if existing:
+#         raise HTTPException(status_code=400, detail="Franchise number already exists.")
+
+#     driver_id = str(uuid.uuid4())
+#     qr_hash = generate_driver_qr_hash(driver_data.franchise_number, driver_data.name)
+    
+#     new_driver = Driver(
+#         _id=driver_id,
+#         name=driver_data.name,
+#         franchise_number=driver_data.franchise_number,
+#         qr_hash=qr_hash,
+#         is_active=False,  # CRITICAL: Pending Admin Approval!
+#         updated_at=datetime.utcnow()
+#     )
+    
+#     await db["drivers"].insert_one(new_driver.model_dump(by_alias=True))
+#     return {
+#         "message": "Registration submitted! Please wait for LGU approval before you can log in.",
+#         "qr_hash": qr_hash, # The mobile app saves this locally
+#         "is_active": False
+#     }
 
 @router.post("/signup", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def public_driver_signup(driver_data: DriverCreate):
@@ -41,19 +71,23 @@ async def public_driver_signup(driver_data: DriverCreate):
     driver_id = str(uuid.uuid4())
     qr_hash = generate_driver_qr_hash(driver_data.franchise_number, driver_data.name)
     
+    # 👇 HASH THE PASSWORD FROM FLUTTER
+    hashed_pw = get_password_hash(driver_data.password)
+    
     new_driver = Driver(
         _id=driver_id,
         name=driver_data.name,
         franchise_number=driver_data.franchise_number,
+        hashed_password=hashed_pw,  # 👇 SAVE IT TO MONGODB
         qr_hash=qr_hash,
-        is_active=False,  # CRITICAL: Pending Admin Approval!
+        is_active=False,
         updated_at=datetime.utcnow()
     )
     
     await db["drivers"].insert_one(new_driver.model_dump(by_alias=True))
     return {
         "message": "Registration submitted! Please wait for LGU approval before you can log in.",
-        "qr_hash": qr_hash, # The mobile app saves this locally
+        "qr_hash": qr_hash, 
         "is_active": False
     }
 

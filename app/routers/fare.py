@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from datetime import datetime
 from pydantic import BaseModel
 import uuid
 
-from app.core.security import get_current_admin
+from app.core.security import get_current_admin, get_current_commuter
 from app.database.mongodb import db_client
 from app.models.domain import FareMatrix
 
@@ -13,14 +13,16 @@ class FareCreate(BaseModel):
     origin: str
     destination: str
     regular_fare: float
-    student_pwd_fare: float
+    student_fare: float
+    senior_fare: float
+    pwd_fare: float
 
 @router.post("/", response_model=FareMatrix)
 async def create_or_update_fare(
     fare_data: FareCreate, 
-    current_admin: dict = Depends(get_current_admin) # <-- ADDED SECURITY LOCK HERE
+    current_admin: dict = Depends(get_current_admin)
 ):
-    """(Admin Only) Add or update a route in the fare matrix."""
+    """(Admin Only) Add or update a route with exact fares for all categories."""
     db = db_client.db
     
     fare_id = str(uuid.uuid4())
@@ -29,7 +31,9 @@ async def create_or_update_fare(
         origin=fare_data.origin,
         destination=fare_data.destination,
         regular_fare=fare_data.regular_fare,
-        student_pwd_fare=fare_data.student_pwd_fare,
+        student_fare=fare_data.student_fare,
+        senior_fare=fare_data.senior_fare,
+        pwd_fare=fare_data.pwd_fare,
         updated_at=datetime.utcnow()
     )
     
@@ -57,3 +61,45 @@ async def delete_fare(fare_id: str, current_admin: dict = Depends(get_current_ad
         raise HTTPException(status_code=404, detail="Fare route not found")
         
     return {"message": "Fare route deleted successfully"}
+
+
+# --- NEW ENDPOINT FOR THE MOBILE APP ---
+
+@router.get("/calculate")
+async def calculate_exact_fare(
+    origin: str = Query(...), 
+    destination: str = Query(...),
+    current_commuter: dict = Depends(get_current_commuter)
+):
+    """(Commuter Only) Securely calculates the exact fare based on passenger category."""
+    db = db_client.db
+    
+    fare_route = await db["fares"].find_one({
+        "$or": [
+            {"origin": origin, "destination": destination},
+            {"origin": destination, "destination": origin}
+        ]
+    })
+    
+    if not fare_route:
+        raise HTTPException(status_code=404, detail="Route not found.")
+        
+    # Check the commuter's profile status in the database
+    commuter_status = current_commuter.get("discount_status", "Regular")
+    
+    # Pick the exact amount based on their status
+    if commuter_status == "Student":
+        exact_amount = fare_route.get("student_fare")
+    elif commuter_status == "Senior":
+        exact_amount = fare_route.get("senior_fare")
+    elif commuter_status == "PWD":
+        exact_amount = fare_route.get("pwd_fare")
+    else:
+        exact_amount = fare_route.get("regular_fare")
+        
+    return {
+        "origin": origin,
+        "destination": destination,
+        "passenger_status": commuter_status,
+        "exact_fare_php": exact_amount
+    }

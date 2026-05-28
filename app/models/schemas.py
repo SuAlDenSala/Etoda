@@ -15,15 +15,13 @@ class SyncPullResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-    role: str  # <-- NEW: Tells the frontend what type of user just logged in
-
-# --- NEW SCHEMAS BELOW ---
+    role: str
 
 class CommuterCreate(BaseModel):
-    name: str
-    email: str
-    password: str
-    discount_status: str = ""
+    name: str = Field(..., description="The commuter's full name", example="Juan Dela Cruz")
+    email: str = Field(..., description="A valid email address", example="juan@example.com")
+    password: str = Field(..., description="Account password (min 8 characters)", example="SecurePass123!")
+    discount_status: str = Field(default="Regular", description="Discount category", example="Student")
 
 class ExternalAppCreate(BaseModel):
     app_name: str
@@ -40,6 +38,12 @@ class DriverSelfRegister(BaseModel):
     tricycle_body_number: str
     photo_url: str
 
+# 👇 THIS IS THE CORRECT DRIVER CREATE SCHEMA
+class DriverCreate(BaseModel):
+    name: str
+    franchise_number: str
+    password: str
+
 class RatingCreate(BaseModel):
     rating_score: int = Field(..., ge=1, le=5)
     feedback: Optional[str] = None
@@ -47,18 +51,7 @@ class RatingCreate(BaseModel):
 
 class CommuterUpdate(BaseModel):
     name: Optional[str] = None
-    discount_status: Optional[str] = None # e.g., "Regular",
-
-class CommuterCreate(BaseModel):
-    name: str = Field(..., description="The commuter's full name", example="Juan Dela Cruz")
-    email: str = Field(..., description="A valid email address", example="juan@example.com")
-    password: str = Field(..., description="Account password (min 8 characters)", example="SecurePass123!")
-    discount_status: str = Field(
-        default="Regular", 
-        description="Discount category: 'Regular', 'Student', 'PWD', or 'Senior'", 
-        example="Student"
-        
-    )
+    discount_status: Optional[str] = None
 
 class SuperAppUserPayload(BaseModel):
     tawiTawiUserId: str
@@ -66,5 +59,4 @@ class SuperAppUserPayload(BaseModel):
     fullName: str
     
 class SuperAppRegisterPayload(SuperAppUserPayload):
-    # This captures extra data like Student/PWD sent during the handshake
     discount_status: str = "Regular"
